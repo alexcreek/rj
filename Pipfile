@@ -4,11 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+spivey = {ref = "develop", git = "https://github.com/alexcreek/spivey.git"}
 requests = "*"
 python-dotenv = "*"
-influxdb-client = "*"
+influxdb-client = "==1.*"
 pandas = "*"
 openpyxl = "*"
+apscheduler = "==3.8.*"
+datadog = "*"
+tzlocal = "==2.*"
 
 [dev-packages]
 pytest = "==6.2.*"
