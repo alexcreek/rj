@@ -10,8 +10,9 @@ from datadog import initialize, api
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest timeseries data')
-    parser.add_argument('-t', '--ticker', help="ticker", type=str, default="$VIX.X")
+    parser.add_argument('-t', '--ticker', help='ticker', type=str, default="$VIX.X")
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
+    parser.add_argument('-n', '--notify', help='notify datadog on findings', action='store_true')
     return parser.parse_args()
 
 def notify(msg, ticker, exp, strike):
@@ -20,8 +21,7 @@ def notify(msg, ticker, exp, strike):
             f'ticker:{ticker}', f'strike:{strike}', f'exp:{exp}']
     api.Event.create(title='Straddle Found', text=msg, tags=tags)
 
-def main(ticker, client, verbose):
-
+def main(ticker, client, _notify, verbose):
     load_dotenv()
     options = client.options(ticker, 45)
     calls = options['callExpDateMap']
@@ -37,7 +37,8 @@ def main(ticker, client, verbose):
                     if abs(k['mark'] - calls[i][j][0]['mark']) <= 0.1:
                         msg = f"{ticker} {exp} @ {k['strikePrice']} - {k['mark']} vol {k['totalVolume']}"
                         print(msg)
-                        notify(msg, ticker, exp, k['strikePrice'])
+                        if _notify:
+                            notify(msg, ticker, exp, k['strikePrice'])
 
 
 if __name__ == '__main__':
@@ -46,7 +47,7 @@ if __name__ == '__main__':
     c = spivey.Client()
     sched = BlockingScheduler()
     sched.add_job(
-        main, args=(args.ticker.upper(), c, args.verbose),
+        main, args=(args.ticker.upper(), c, args.notify, args.verbose),
         trigger='cron', second='*/30'
     )
     sched.start()
