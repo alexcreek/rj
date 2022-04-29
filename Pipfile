@@ -5,6 +5,10 @@ name = "pypi"
 
 [packages]
 requests = "*"
+python-dotenv = "*"
+influxdb-client = "*"
+pandas = "*"
+openpyxl = "*"
 
 [dev-packages]
 pytest = "==6.2.*"
