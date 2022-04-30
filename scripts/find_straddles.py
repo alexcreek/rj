@@ -29,6 +29,22 @@ def main(ticker, client, _notify, verbose):
 
     thresholds = {
         '$VIX.X': 0.1,
+        'SPY': .1,
+        'AMZN': 10,
+        'FB': 1,
+        'TSLA': 2,
+        'SPOT': 1,
+        'GOOG': 1,
+        'NFLX': 1,
+        'SHOP': 1,
+        'PTON': 1,
+        'NVDA': 1,
+        'MSFT': 1,
+        'AAPL': 1,
+        'V': 1,
+        'XOM': 1,
+        'SNAP': 1,
+        'SNOW': 1,
     }
 
     # pylint: disable=too-many-nested-blocks
