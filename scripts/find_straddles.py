@@ -27,6 +27,11 @@ def main(ticker, client, _notify, verbose):
     calls = options['callExpDateMap']
     puts = options['putExpDateMap']
 
+    thresholds = {
+        '$VIX.X': 0.1,
+    }
+
+    # pylint: disable=too-many-nested-blocks
     for i in puts:
         exp = dt.strftime(date_parse(i.split(':')[0]),'%d %b %y').upper()
         if verbose:
@@ -34,7 +39,7 @@ def main(ticker, client, _notify, verbose):
         for j in puts[i]:
             for k in puts[i][j]:
                 if k['mark'] > 0:
-                    if abs(k['mark'] - calls[i][j][0]['mark']) <= 0.1:
+                    if abs(k['mark'] - calls[i][j][0]['mark']) <= thresholds[ticker]:
                         msg = f"{ticker} {exp} @ {k['strikePrice']} - {k['mark']} vol {k['totalVolume']}"
                         print(msg)
                         if _notify:
@@ -50,4 +55,7 @@ if __name__ == '__main__':
         main, args=(args.ticker.upper(), c, args.notify, args.verbose),
         trigger='cron', second='*/30'
     )
-    sched.start()
+    try:
+        sched.start()
+    except KeyboardInterrupt:
+        pass
