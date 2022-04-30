@@ -39,8 +39,11 @@ def main(ticker, client, _notify, verbose):
         for j in puts[i]:
             for k in puts[i][j]:
                 if k['mark'] > 0:
-                    if abs(k['mark'] - calls[i][j][0]['mark']) <= thresholds[ticker]:
-                        msg = f"{ticker} {exp} @ {k['strikePrice']} - {k['mark']} vol {k['totalVolume']}"
+                    delta = round(abs(k['mark'] - calls[i][j][0]['mark']), 2)
+                    if verbose:
+                        print(' ', k['strikePrice'], delta)
+                    if delta <= thresholds[ticker]:
+                        msg = f"{ticker} {exp} @ {k['strikePrice']} - mark={k['mark']} vol={k['totalVolume']} delta={delta}"
                         print(msg)
                         if _notify:
                             notify(msg, ticker, exp, k['strikePrice'])
