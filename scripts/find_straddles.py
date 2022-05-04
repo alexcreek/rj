@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 -u
 import argparse
 from datetime import datetime as dt
 from dotenv import load_dotenv
