@@ -53,7 +53,7 @@ def main(ticker, client, _notify, verbose):
             print(f"[*] working through {exp}")
         for j in puts[i]:
             for k in puts[i][j]:
-                if k['mark'] > 0:
+                if k['mark'] > 0 and calls[i][j][0]['mark'] > 0:
                     delta = round(abs(k['mark'] - calls[i][j][0]['mark']), 2)
                     if verbose:
                         print(' ', 'put', k['strikePrice'], k['mark'])
