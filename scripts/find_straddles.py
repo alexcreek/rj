@@ -28,11 +28,9 @@ def main(ticker, client, _notify, verbose):
     puts = options['putExpDateMap']
 
     thresholds = {
-        '$VIX.X': 0.1,
-        'SPY': .1,
         'AMZN': 10,
         'FB': 1,
-        'TSLA': 2,
+        'TSLA': 1,
         'SPOT': 1,
         'GOOG': 1,
         'NFLX': 1,
@@ -45,6 +43,7 @@ def main(ticker, client, _notify, verbose):
         'XOM': 1,
         'SNAP': 1,
         'SNOW': 1,
+        'AMD': 0.2,
     }
 
     # pylint: disable=too-many-nested-blocks
