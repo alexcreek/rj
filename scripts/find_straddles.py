@@ -44,7 +44,6 @@ def main(ticker, client, _notify, _exp, verbose):
         'XOM': 1,
         'SNAP': 1,
         'SNOW': 1,
-        'AMD': 0.2,
     }
 
     # pylint: disable=too-many-nested-blocks
