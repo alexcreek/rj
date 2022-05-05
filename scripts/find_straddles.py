@@ -10,9 +10,10 @@ from datadog import initialize, api
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest timeseries data')
-    parser.add_argument('-t', '--ticker', help='ticker', type=str, default="$VIX.X")
+    parser.add_argument('-t', '--ticker', help='ticker', default="$VIX.X")
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('-n', '--notify', help='notify datadog on findings', action='store_true')
+    parser.add_argument('-e', '--exp', help='specific expiration to search for', default='')
     return parser.parse_args()
 
 def notify(msg, ticker, exp, strike):
@@ -21,7 +22,7 @@ def notify(msg, ticker, exp, strike):
             f'ticker:{ticker}', f'strike:{strike}', f'exp:{exp}']
     api.Event.create(title='Straddle Found', text=msg, tags=tags)
 
-def main(ticker, client, _notify, verbose):
+def main(ticker, client, _notify, _exp, verbose):
     load_dotenv()
     options = client.options(ticker, 45)
     calls = options['callExpDateMap']
@@ -49,6 +50,10 @@ def main(ticker, client, _notify, verbose):
     # pylint: disable=too-many-nested-blocks
     for i in puts:
         exp = dt.strftime(date_parse(i.split(':')[0]),'%d %b %y').upper()
+        if _exp:
+            # Used an if not to avoid yet another nested block.
+            if not _exp in exp:
+                continue
         if verbose:
             print(f"[*] working through {exp}")
         for j in puts[i]:
@@ -73,7 +78,7 @@ if __name__ == '__main__':
     c = spivey.Client()
     sched = BlockingScheduler()
     sched.add_job(
-        main, args=(args.ticker.upper(), c, args.notify, args.verbose),
+        main, args=(args.ticker.upper(), c, args.notify, args.exp.upper(), args.verbose),
         trigger='cron', second='*/30'
     )
     try:
