@@ -17,7 +17,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def iterate(start, exp, strike, putCall, points, verbose=False):
+def main(start, exp, strike, putCall, points, verbose=False):
     # pylint: disable=too-many-locals
     load_dotenv()
     token = os.environ['INFLUXDB_TOKEN']
@@ -52,9 +52,6 @@ def iterate(start, exp, strike, putCall, points, verbose=False):
                 for i in output:
                     print(f"{points} minutes from {i['timestamp'].time()} {round(i['change'] * 100, 1)} ")
 
-def main(start, exp, strike, putCall, points, verbose=False):
-    for p in [points]:
-        iterate(start, exp, strike, putCall, p, verbose=verbose)
 
 if __name__ == '__main__':
     args = parse_arguments()
