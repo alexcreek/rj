@@ -50,8 +50,7 @@ def iterate(start, exp, strike, putCall, points, verbose=False):
                     output = utils.find_swings(df, points)
 
                 for i in output:
-                    print(i['timestamp'].time(), i['change'] * 100)
-                print('done')
+                    print(f"{points} minutes from {i['timestamp'].time()} {round(i['change'] * 100, 1)} ")
 
 def main(start, exp, strike, putCall, points, verbose=False):
     for p in [points]:

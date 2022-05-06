@@ -324,11 +324,14 @@ class CumEvalWindow:
         if len(self.points) < self.points_threshold:
             return
 
+        changed = 0
         start = self.points.popleft()
-        changed = self.change(start, sum(self.points))
+        for point in self.points:
+            changed += self.change(start, point)
+
         self.output.append({
             'change': changed,
-            'timestamp': to_dst(self.times[-1])
+            'timestamp': to_dst(self.times[0])
         })
 
     def results(self):
