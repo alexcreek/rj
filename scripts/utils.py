@@ -15,7 +15,7 @@ def change(start, current):
     """
     return round((current - start) / start, 4)
 
-def timestamps_per_minute(days, start):
+def timestamps_per_minute(days, start=False):
     """Generate timestamps at 1 minute intervals.
 
     Args:
