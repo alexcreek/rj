@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import utils
-from lib import backtest
+import backtest
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest timeseries data')

@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
 from dateutil.parser import parse
 import utils
-from lib import backtest
+import backtest
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest timeseries data')
