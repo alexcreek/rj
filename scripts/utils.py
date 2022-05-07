@@ -75,6 +75,23 @@ def timestamps_per_day(days, start):
 
     return ret
 
+def timestamps_one_day_by_minute(dst=True):
+    """Generate minute timestamps for one day.
+
+    Args:
+        dst (bool): Flag to convert timestamps to dst.
+
+    Returns:
+        list()
+    """
+    ret = []
+    start = dt.utcnow().replace(hour=13, minute=30, second=0, microsecond=0)
+
+    for i in range(391):
+        ts = to_dst(start + timedelta(minutes=i)).strftime('%H:%M:%S')
+        ret.append(ts)
+    return ret
+
 def min(df):
    # pylint: disable=redefined-builtin
     return round(df['_value'].min(), 2)
