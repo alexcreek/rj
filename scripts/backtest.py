@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-import sys
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
 from dateutil.parser import parse
@@ -32,75 +31,79 @@ def main(start, exp, strike, putCall, limit, stop, time, verbose=False):
                         |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
                  """
                 df = query_api.query_data_frame(query)
-                output = []
 
                 # Calculate
                 if not df.empty:
-                    backtest(df, limit, stop, time)
-
-def backtest(df, limit, stop, time):
-    """Backtest timeseries data using limit and stop limit.
-
-    Args:
-        df (dataframe): A days worth of timeseries data.
-        limit(float): The percentage of the strike to use as the limit.
-        stop(float): The percentage of the strike to use as the stop limit.
-
-    Returns:
-        idk
-    """
-    b = BacktestWindow(limit, stop, time)
-    for i in df.itertuples():
-        # time i[5]
-        # value i[6]
-        b.eval(i[5], i[6])
-
+                    b = BacktestWindow(limit, stop, time, verbose)
+                    return b.eval(df)
 
 class BacktestWindow:
-    """Sum the total change in timeseries data"""
-    def __init__(self, limit, stop, time):
+    """Test timeseries data against limits and stops"""
+    def __init__(self, limit, stop, time, verbose):
         self.limit = limit
         self.stop = stop
-        self.time = parse(time).time()
+        self.verbose = verbose
+        self.start_time = parse(time).time()
         self.times = []
         self.changed = 0
         self.start = 0
+        self.results = {}
 
-    def eval(self, time, value):
+    def eval(self, df):
         """Apply an evaluation window to timeseries data
 
         Args:
-            time (datetime.datetime) - The measurement's time.
-            value (float) - The measurement's value.
-        if we need more points, get more points
-        if we have enough points,
-            sum
-            save stuff
-            empty tracking list
-            repeat the loop
+            df (dataframe): Timeseries data
+
+        Returns:
+            dict of format:
+                result: limit|stop|runaway
+                limit:  limit value
+                stop:  stop value
+                minutes: number of iterations
+                start: start time
+                stop: stop time
         """
-        if utils.to_dst(time).time() < self.time:
-            return
+        for i in df.itertuples():
+            time = utils.to_dst(i[5]).time()
+            value = i[6]
 
-        if not self.start:
-            self.start = value
-            return
+            if time < self.start_time:
+                continue
 
-        self.times.append(time)
-        self.changed = self.change(self.start, value)
+            if not self.start:
+                self.start = value
+                continue
 
-        print(f'{utils.to_dst(self.times[-1])} {self.changed}')
+            self.times.append(time)
+            self.changed = self.change(self.start, value)
 
-        if self.changed >= self.limit:
-            print('limit hit')
-            print(f'{len(self.times)} minutes')
-            sys.exit(0)
+            if self.verbose:
+                print(f'{self.times[-1]} {self.changed}')
 
-        if self.changed <= self.stop:
-            print('stop hit')
-            print(f'{len(self.times)} minutes')
-            sys.exit(0)
+            if self.changed >= self.limit:
+                if self.verbose:
+                    print('limit hit')
+                    print(f'{len(self.times)} minutes')
+                self.generate_results()
+                self.results['result'] = 'limit'
+                return self.results
 
+            if self.changed <= self.stop:
+                if self.verbose:
+                    print('stop hit')
+                    print(f'{len(self.times)} minutes')
+                self.generate_results()
+                self.results['result'] = 'stop'
+                return self.results
+
+            if time == parse('16:00:00').time():
+                if self.verbose:
+                    print('runaway')
+                    print(f'{len(self.times)} minutes')
+                self.generate_results()
+                self.results['result'] = 'runaway'
+                return self.results
 
     def change(self, start, current):
         # pylint: disable=no-self-use
@@ -114,3 +117,10 @@ class BacktestWindow:
             float
         """
         return round((current - start) / start, 4)
+
+    def generate_results(self):
+        self.results['limit'] = self.limit
+        self.results['stop'] = self.stop
+        self.results['minutes'] = len(self.times)
+        self.results['begin'] = self.times[0]
+        self.results['end'] = self.times[-1]

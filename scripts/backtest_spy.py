@@ -11,7 +11,7 @@ def parse_arguments():
     parser.add_argument('--limit', help='limit', type=float, required=True)
     parser.add_argument('--stop', help='stop limit', type=float, required=True)
     parser.add_argument('--time', help='time to start with', required=True)
-    parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
+    parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true', default=True)
     return parser.parse_args()
 
 def main(start, exp, strike, putCall, limit, stop, time, verbose=False):
