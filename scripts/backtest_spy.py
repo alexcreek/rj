@@ -15,7 +15,8 @@ def parse_arguments():
     return parser.parse_args()
 
 def main(start, exp, strike, putCall, limit, stop, time, verbose=False):
-    backtest.main(start, exp, strike, putCall, limit, stop, time, verbose)
+    ts = backtest.query_timeseries(start, exp, strike, putCall)
+    backtest.main(ts, limit, stop, time, verbose)
 
 
 if __name__ == '__main__':

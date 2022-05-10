@@ -5,7 +5,7 @@ from influxdb_client import InfluxDBClient
 from dateutil.parser import parse
 import utils
 
-def main(start, exp, strike, putCall, limit, stop, time, verbose=False):
+def query_timeseries(start, exp, strike, putCall):
     # pylint: disable=too-many-locals
     load_dotenv()
     token = os.environ['INFLUXDB_TOKEN']
@@ -30,12 +30,12 @@ def main(start, exp, strike, putCall, limit, stop, time, verbose=False):
                         |> filter(fn: (r) => r._field == "mark")
                         |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
                  """
-                df = query_api.query_data_frame(query)
+                return query_api.query_data_frame(query)
 
-                # Calculate
-                if not df.empty:
-                    b = BacktestWindow(limit, stop, time, verbose)
-                    return b.eval(df)
+
+def main(df, limit, stop, time, verbose=False):
+    b = BacktestWindow(limit, stop, time, verbose)
+    return b.eval(df)
 
 class BacktestWindow:
     """Test timeseries data against limits and stops"""
