@@ -88,7 +88,7 @@ def timestamps_one_day_by_minute(dst=True):
     start = dt.utcnow().replace(hour=13, minute=30, second=0, microsecond=0)
 
     for i in range(391):
-        ts = to_dst(start + timedelta(minutes=i)).strftime('%H:%M:%S')
+        ts = to_dst(start + timedelta(minutes=i)).strftime('%H:%M:%s')
         ret.append(ts)
     return ret
 
@@ -192,86 +192,6 @@ def stats(df):
         'change': change_df(df),
         'weekday': weekday(df)
     }
-
-def find_inversion(df, points, change):
-    """Find change in timeseries data.
-
-    A timeseries evaluation window consists of 2 things, time and change.
-    This function applies an eval window to a series of data and reports
-    when the data's value changes direction e.g. inverts
-    1. Create an eval window from supplied parameters
-    2. Evaluate data using the window
-    3. Record each instance the data's value inverts
-
-    Args:
-        df (dataframe): A days worth of timeseries data.
-        points (int): The number of datapoints to use in the eval window.
-        change (float): The percentage of change used to identify an inversion.
-
-    Returns:
-        idk
-    """
-    e = EvalWindow(points, change)
-    for i in df.itertuples():
-        # time i[5]
-        # value i[6]
-        e.eval(i[5], i[6])
-
-    return e.results()
-
-class EvalWindow:
-    """Track change in data"""
-    def __init__(self, points_threshold, change_threshold):
-        # pylint: disable=redefined-outer-name
-        self.points_threshold = points_threshold
-        self.change_threshold = change_threshold
-        self.points = deque(maxlen=points_threshold)
-        self.times = deque(maxlen=points_threshold)
-        self.triggered = []
-
-    def eval(self, time, value):
-        """Apply an evaluation window to timeseries data
-
-        Args:
-            time (datetime.datetime) - The measurement's time.
-            value (float) - The measurement's value.
-        """
-        self.points.append(value)
-        self.times.append(time)
-
-        # Skip evaluation until we have enough points
-        if len(self.points) != self.points_threshold:
-            return
-
-        # Actually do the eval
-        # Matches positive and negative change
-        # changed = abs(self.change(self.points[0], self.points[-1]))
-        # if changed >= self.change_threshold:
-
-        # Matches negative change
-        changed = self.change(self.points[0], self.points[-1])
-        if changed <= self.change_threshold * -1:
-            self.triggered.append({
-                'change': changed,
-                'value': self.points[-1],
-                'timestamp': to_dst(self.times[-1])
-            })
-
-    def results(self):
-        return self.triggered
-
-    def change(self, start, current):
-        # pylint: disable=no-self-use
-        """Calculate the percent of change between two values.
-
-        Args:
-           start (float): The starting value.
-           current (float):  The current values.
-
-        Returns:
-            float
-        """
-        return round((current - start) / start, 4)
 
 def to_dst(timestamp):
     _date = timestamp.strftime('%m-%d')
