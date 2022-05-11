@@ -34,9 +34,9 @@ def main(start, exp, strike, putCall, verbose=False):
         total.append({
             'limit': res['limit'][0],
             'stop': res['stop'][0],
-            'limits percent': round(len(res.query('result == "limit"')) / len(res) * 100, 2),
-            'stops percent': round(len(res.query('result == "stop"')) / len(res) * 100, 2),
-            'runaways percent': round(len(res.query('result == "runaway"')) / len(res) * 100, 2),
+            'limit %': round(len(res.query('result == "limit"')) / len(res) * 100, 2),
+            'stop %': round(len(res.query('result == "stop"')) / len(res) * 100, 2),
+            'runaway %': round(len(res.query('result == "runaway"')) / len(res) * 100, 2),
             'limits': len(res.query('result == "limit"')),
             'stops': len(res.query('result == "stop"')),
             'runaways': len(res.query('result == "runaway"')),
