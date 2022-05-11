@@ -1,6 +1,5 @@
 from datetime import datetime as dt
 from datetime import timedelta
-from collections import deque
 from dateutil.parser import parse
 
 def change(start, current):
@@ -205,84 +204,3 @@ def to_dst(timestamp):
         dst_offset = 5
 
     return timestamp - timedelta(hours=dst_offset)
-
-def find_swings(df, points):
-    """Find gains and losses in timeseries data.
-
-    This function applies an eval window to a series of data and reports
-    when the data's value changes.
-    1. Create an eval window from supplied parameters
-    2. Evaluate data using the window
-    3. Record each instance the data's value changes
-
-    Args:
-        df (dataframe): A days worth of timeseries data.
-        points (int): The number of datapoints to use in the eval window.
-
-    Returns:
-        idk
-    """
-    c = CumEvalWindow(points)
-    for i in df.itertuples():
-        # time i[5]
-        # value i[6]
-        c.eval(i[5], i[6])
-
-    return c.results()
-
-
-class CumEvalWindow:
-    """Sum the total change in timeseries data"""
-    def __init__(self, points_threshold):
-        # pylint: disable=redefined-outer-name
-        self.points_threshold = points_threshold
-        self.points = deque(maxlen=points_threshold)
-        self.times = deque(maxlen=points_threshold)
-        self.output = []
-
-    def eval(self, time, value):
-        """Apply an evaluation window to timeseries data
-
-        Args:
-            time (datetime.datetime) - The measurement's time.
-            value (float) - The measurement's value.
-        if we need more points, get more points
-        if we have enough points,
-            sum
-            save stuff
-            empty tracking list
-            repeat the loop
-        """
-
-        self.points.append(value)
-        self.times.append(time)
-
-        # Wait until we have enough points
-        if len(self.points) < self.points_threshold:
-            return
-
-        changed = 0
-        start = self.points.popleft()
-        for point in self.points:
-            changed += self.change(start, point)
-
-        self.output.append({
-            'change': changed,
-            'timestamp': to_dst(self.times[0])
-        })
-
-    def results(self):
-        return self.output
-
-    def change(self, start, current):
-        # pylint: disable=no-self-use
-        """Calculate the percent of change between two values.
-
-        Args:
-           start (float): The starting value.
-           current (float):  The current values.
-
-        Returns:
-            float
-        """
-        return round((current - start) / start, 4)
