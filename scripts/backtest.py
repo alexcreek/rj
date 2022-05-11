@@ -68,11 +68,21 @@ class BacktestWindow:
             time = utils.to_dst(i[5]).time()
             value = i[6]
 
+            # Don't evaluate until we're ready
             if time < self.start_time:
                 continue
 
+            # Must have a starting value
             if not self.start:
                 self.start = value
+                continue
+
+            # Don't evaluate in the power hour
+            if self.start_time > parse('14:59:00').time():
+                continue
+
+            # Don't evaluate in the morning
+            if self.start_time < parse('09:59:00').time():
                 continue
 
             self.times.append(time)
