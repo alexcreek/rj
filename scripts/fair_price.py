@@ -9,7 +9,7 @@ from influxdb_client import InfluxDBClient
 import utils
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Determine the fair price for a contract')
+    parser = argparse.ArgumentParser(description='Determine the fair price for a VIX contract')
     parser.add_argument('-e', '--exp', help="contract's expiration", type=str, required=True)
     parser.add_argument('-t', '--type', help='put or call', type=str, required=True)
     parser.add_argument('-s', '--strike', help="contract's strike", type=float, required=True)

@@ -7,7 +7,7 @@ import numpy as np
 import backtest
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='What is the highest performing bracket for SPY options?')
+    parser = argparse.ArgumentParser(description='Find the highest performing bracket for SPY options')
     parser.add_argument('--start', help='day to start with', required=True)
     parser.add_argument('-e', '--exp', help='expiration', required=True)
     parser.add_argument('-s', '--strike', help='strike', required=True)

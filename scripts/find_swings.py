@@ -7,7 +7,7 @@ import numpy as np
 import utils
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Backtest timeseries data')
+    parser = argparse.ArgumentParser(description='Find gains and losses in SPY contracts')
     parser.add_argument('--start', help='day to start with', required=True)
     parser.add_argument('-e', '--exp', help='expiration', required=True)
     parser.add_argument('-s', '--strike', help='strike', required=True)

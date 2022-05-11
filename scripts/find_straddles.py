@@ -9,7 +9,7 @@ from datadog import initialize, api
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Backtest timeseries data')
+    parser = argparse.ArgumentParser(description='Poll live options contracts looking for puts and calls around the same price')
     parser.add_argument('-t', '--ticker', help='ticker', default="$VIX.X")
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('-n', '--notify', help='notify datadog on findings', action='store_true')
