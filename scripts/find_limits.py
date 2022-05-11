@@ -4,7 +4,7 @@ import argparse
 import utils
 import pandas as pd
 import numpy as np
-import backtest
+from lib import backtest
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Find the highest performing bracket for SPY options')

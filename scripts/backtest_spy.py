@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import backtest
+from lib import backtest
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest SPY options')
