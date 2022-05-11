@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
@@ -6,7 +5,6 @@ from dateutil.parser import parse
 import utils
 
 def query_timeseries(start, exp, strike, putCall):
-    # pylint: disable=too-many-locals
     load_dotenv()
     token = os.environ['INFLUXDB_TOKEN']
     url = os.environ['INFLUXDB_URL']
