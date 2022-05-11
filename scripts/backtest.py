@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
 from dateutil.parser import parse
 import utils
+from lib.models import Window
 
 def query_timeseries(start, exp, strike, putCall):
     load_dotenv()
@@ -35,7 +36,7 @@ def main(df, limit, stop, time, verbose=False):
     b = BacktestWindow(limit, stop, time, verbose)
     return b.eval(df)
 
-class BacktestWindow:
+class BacktestWindow(Window):
     """Test timeseries data against limits and stops"""
     def __init__(self, limit, stop, time, verbose):
         self.limit = limit
@@ -112,19 +113,6 @@ class BacktestWindow:
                 self.generate_results()
                 self.results['result'] = 'runaway'
                 return self.results
-
-    def change(self, start, current):
-        # pylint: disable=no-self-use
-        """Calculate the percent of change between two values.
-
-        Args:
-           start (float): The starting value.
-           current (float):  The current values.
-
-        Returns:
-            float
-        """
-        return round((current - start) / start, 4)
 
     def generate_results(self):
         self.results['limit'] = self.limit

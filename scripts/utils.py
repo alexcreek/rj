@@ -88,7 +88,7 @@ def timestamps_one_day_by_minute(dst=True):
     start = dt.utcnow().replace(hour=13, minute=30, second=0, microsecond=0)
 
     for i in range(391):
-        ts = to_dst(start + timedelta(minutes=i)).strftime('%H:%M:%s')
+        ts = to_dst(start + timedelta(minutes=i)).strftime('%H:%M:%S')
         ret.append(ts)
     return ret
 

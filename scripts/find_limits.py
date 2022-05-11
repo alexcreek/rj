@@ -42,7 +42,7 @@ def main(start, exp, strike, putCall, verbose=False):
             'runaways': len(res.query('result == "runaway"')),
         })
     print('[*] done')
-    filename = f"{exp.replace(' ', '')}_{strike}_{putCall}.xlsx" 
+    filename = f"{exp.replace(' ', '')}_{strike}_{putCall}.xlsx"
     pd.DataFrame(total).to_excel(filename)
     os.system(f'open {filename}')
 

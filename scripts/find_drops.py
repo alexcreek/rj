@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
 import numpy as np
 import utils
+from lib.models import Window
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Backtest timeseries data')
@@ -42,7 +43,7 @@ def find_inversion(df, points, change):
 
     return e.results()
 
-class EvalWindow:
+class EvalWindow(Window):
     """Track change in data"""
     def __init__(self, points_threshold, change_threshold):
         # pylint: disable=redefined-outer-name
@@ -83,18 +84,6 @@ class EvalWindow:
     def results(self):
         return self.triggered
 
-    def change(self, start, current):
-        # pylint: disable=no-self-use
-        """Calculate the percent of change between two values.
-
-        Args:
-           start (float): The starting value.
-           current (float):  The current values.
-
-        Returns:
-            float
-        """
-        return round((current - start) / start, 4)
 
 def iterate(days, points, change, start=None, verbose=False):
     # pylint: disable=too-many-locals
