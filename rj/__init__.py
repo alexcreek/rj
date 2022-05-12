@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 import spivey
 
 def get_settings():
-    """Collect app settings from environment variables"""
+    """Collect app settings from environment variables
+
+    Returns:
+        dict
+    """
     return {
         'days': os.getenv('DAYS', 14),
-        'ticker': os.getenv('TICKER', 'SPY'),
+        'ticker': os.getenv('TICKER', 'SPY').upper(),
         'points': os.getenv('POINTS', 10),
         'change': os.getenv('CHANGE', 0.2),
         'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
