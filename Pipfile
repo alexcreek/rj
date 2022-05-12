@@ -13,6 +13,7 @@ openpyxl = "*"
 apscheduler = "==3.8.*"
 datadog = "*"
 tzlocal = "==2.*"
+twilio = "*"
 
 [dev-packages]
 pytest = "==6.2.*"
