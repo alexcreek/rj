@@ -1,4 +1,5 @@
 import os
+import sys
 from time import sleep
 from collections import deque
 from dotenv import load_dotenv
@@ -11,10 +12,10 @@ def get_settings():
         dict
     """
     return {
-        'days': os.getenv('DAYS', 14),
+        'days': int(os.getenv('DAYS', '14')),
         'ticker': os.getenv('TICKER', 'SPY').upper(),
-        'points': os.getenv('POINTS', 10),
-        'change': os.getenv('CHANGE', 0.2),
+        'points': int(os.getenv('POINTS', '10')),
+        'change': float(os.getenv('CHANGE', '0.2')),
         'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
         'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
     }
@@ -35,7 +36,7 @@ def does_envvar_exist(var):
     try:
         os.environ[var]
     except KeyError as e:
-        logging.critical('%s environment variable not found', e)
+        print(f'{e} environment variable not found')
         sys.exit(1)
 
 def main():
