@@ -15,7 +15,10 @@ def get_settings():
         'days': int(os.getenv('DAYS', '14')),
         'ticker': os.getenv('TICKER', 'SPY').upper(),
         'points': int(os.getenv('POINTS', '10')),
-        'change': float(os.getenv('CHANGE', '0.2')),
+        'change': float(os.getenv('CHANGE', '0.5')),
+        # I think order when there's a .5% change, not sure how by much time tho
+        'bracket': float(os.getenv('BRACKET', '0.2')),
+        # only use a limit and stop of.20, $bracket
         'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
         'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
     }
@@ -48,38 +51,71 @@ def main():
     Returns:
         Nothing yet
     """
-    ticker='SPY'
-    days=14
     load_dotenv()
+    assert_credentials_exist()
+
+    settings = get_settings()
     c = spivey.Client()
     while True:
-        last = c.underlying(ticker)
-        # add last to a window class instance
+        # start tracking change
+        fetch_data(c, settings['ticker'])
 
-        # when the instance triggers, start fucking with the options
-        c.options(ticker, days)
+        # when the instance triggers, start munging the options
+        #c.options(ticker, days)
         sleep(30)
-# dont order before 10am and after 4pm
-# dont use apscheduler to poll
-# tasks
-    # keep track of change
-    # order
-    # notify
+
+# TASKS
+# keep track of change
+# order
+# notify
+
 # when you order, text me
-# only use a limit and stop of.20, $bracket
-# when you buy, do the math for $bracket
-# when you buy, convert to a full symbol
-# when you buy,
-    # find the value of spy from the api
-    # find an exp within a range of 1dte to 5dte
-    # drops buy puts
-    # rises buy calls
-# make a backend for testing - influx
-# make a backend for prod - tda
+def text_me(msg):
+    """Send an sms via twilio
+
+    Args:
+        msg (str): Body of the text message.
+    """
+    pass
+
+def buy():
+    # when you buy, do the math for $bracket
+    # when you buy, convert to a full symbol
+    # when you buy,
+        # find the value of spy from the api
+            # we'll already have this data, duh
+        # find an exp within a range of 1dte to 5dte
+        # drops buy puts
+        # rises buy calls
+    pass
+
+def find_exp_in_dte_range(_min, _max):
+    """Return the first expiration from a range of dtes"""
+    pass
+
+
+def fetch_price(client, ticker):
+    """Retrive price for a given asset
+
+    Args:
+        client (Spivey instance): Client for the tdameritrade API.
+        ticker (str): The asset's stock ticker.
+
+    Return:
+        float
+    """
+    return client.underlying(ticker)
+    # make a backend for testing - influx
+    # make a backend for prod - tda
+    pass
+
+# dont order before 10am and after 4pm
 # REMEMBER THE TEST DATA IS PER MINUTE BUT WE'RE GONNA HIT THE API EVERY 30S
-# I think order when there's a .5% change, not sure how by much time tho
+
 # add a backoff after triggering so there aren't repeated buys for the same change
     # poll open orders every n minutes
+def cooldown():
+    pass
 
 
 class EvalWindow():
