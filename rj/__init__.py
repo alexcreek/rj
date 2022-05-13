@@ -1,7 +1,6 @@
 import os
 import sys
 from time import sleep
-from collections import deque
 from dotenv import load_dotenv
 import spivey
 
@@ -116,54 +115,3 @@ def fetch_price(client, ticker):
     # poll open orders every n minutes
 def cooldown():
     pass
-
-
-class EvalWindow():
-    """Evaluate timeseries data for change"""
-    def __init__(self, points_threshold, change_threshold):
-        """
-        Args:
-            points_threshold (int): The amount of points to keep.
-            change_threshold (float): The amount of change to action on.
-        """
-        self.points_threshold = points_threshold
-        self.change_threshold = change_threshold
-        self.points = deque(maxlen=points_threshold)
-        self.times = deque(maxlen=points_threshold)
-
-    def eval(self, time, value):
-        """Apply an evaluation window to timeseries data
-
-        Args:
-            time (datetime.datetime) - The measurement's time.
-            value (float) - The measurement's value.
-        """
-        self.points.append(value)
-        self.times.append(time)
-
-        # Skip evaluation until we have enough points
-        if len(self.points) != self.points_threshold:
-            return
-
-        # Evaluate
-        changed = self.change(self.points[0], self.points[-1])
-        # If positive change is greater than or equal to change threshold
-#        if changed <= self.change_threshold:
-        # If negative change is greater than or equal to change threshold
-#        if changed >= self.change_threshold:
-
-    def change(self, start, current):
-        """Calculate the percent of change between two values.
-
-        Args:
-           start (float): The starting value.
-           current (float):  The current values.
-
-        Returns:
-            float
-        """
-        return round((current - start) / start, 4)
-
-    def results(self):
-        return self.triggered
-
