@@ -9,21 +9,28 @@ from rj.models import Evaluator
 # https://docs.pytest.org/en/6.2.x/fixture.html
 # https://docs.pytest.org/en/6.2.x/capture.html
 
+@pytest.fixture
+def evaluator(points, change):
+    return Evaluator(points, change, Queue(), Queue())
+
 class TestEvaluator:
-    def test_positive_change(self):
-        e = Evaluator(4, 0.3, Queue(), Queue())
+    @pytest.mark.parametrize('points, change', [(4, 0.3)])
+    def test_positive_change(self, evaluator, points, change):
+        e = evaluator
         for value in range(10, 14):
             e.eval(dt.now().time(), value)
         assert e.outq.get_nowait() == 'call'
 
-    def test_negative_change(self):
-        e = Evaluator(4, -0.2, Queue(), Queue())
+    @pytest.mark.parametrize('points, change', [(4, -0.2)])
+    def test_negative_change(self, evaluator, points, change):
+        e = evaluator
         for value in range(14, 10, -1):
             e.eval(dt.now().time(), value)
         assert e.outq.get_nowait() == 'put'
 
-    def test_that_maxpoints_is_honored(self):
-        e = Evaluator(2, 0.1, Queue(), Queue())
+    @pytest.mark.parametrize('points, change', [(2, 0.1)])
+    def test_that_maxpoints_is_honored(self, evaluator, points, change):
+        e = evaluator
         for value in [1, 1, 1]:
             e.eval(dt.now().time(), value)
         assert len(e.values) == 2
