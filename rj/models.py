@@ -23,23 +23,23 @@ class Evaluator(Thread):
 
     def run(self):
         while True:
-            time, value = self.inq.get()
-            if isinstance(time, datetime.time) and isinstance(value, float):
-                self.eval(time, value)
+            timestamp, value = self.inq.get()
+            if isinstance(timestamp, datetime.time) and isinstance(value, float):
+                self.eval(timestamp, value)
             else:
-                logging.info('Point data types are incorrect - %s, %s', time, value)
+                logging.info('Point data types are incorrect - %s, %s', timestamp, value)
             self.inq.task_done()
 
 
-    def eval(self, time, value):
+    def eval(self, timestamp, value):
         """Apply evaluation logic to the data.
 
         Args:
-            time (datetime.datetime.time): The point's time.
+            timestamp (datetime.datetime.time): The point's time.
             value (float):  The point's value.
         """
         self.values.append(value)
-        self.times.append(time)
+        self.times.append(timestamp)
 
         # Skip evaluation until we have enough points
         if len(self.values) < self.max_points:
