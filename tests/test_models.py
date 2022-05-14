@@ -1,7 +1,8 @@
 from queue import Queue
 from datetime import datetime as dt
+import datetime
 import pytest
-from rj.models import Evaluator
+from rj.models import Evaluator, Point
 
 # pylint: skip-file
 # https://docs.pytest.org/en/6.2.x/getting-started.html
@@ -43,7 +44,24 @@ class TestEvaluator:
     def test_consuming_from_a_queue(self, evaluator, points, change):
         e = evaluator
         e.daemon = True # Stop when pytest exits.
-        e.inq.put([dt.now().time(), 1.0])
+        e.inq.put(Point(dt.now().time(), 1.0))
         e.start()
         assert len(e.values) == 1
         assert len(e.times) == 1
+
+class TestPoint:
+    def test_that_timestamps_are_dt_objects(self):
+        p = Point(dt.now().time(), 1.0)
+        assert isinstance(p.timestamp, datetime.time)
+
+    def test_that_values_are_floats(self):
+        p = Point(dt.now().time(), 1.0)
+        assert isinstance(p.value, float)
+
+    def test_timestamp_exceptions(self):
+        with pytest.raises(TypeError):
+            Point(dt.now().time().isoformat(), 1.0)
+
+    def test_value_exceptions(self):
+        with pytest.raises(TypeError):
+            Point(dt.now().time().isoformat(), '1.0')

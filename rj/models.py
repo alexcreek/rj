@@ -1,7 +1,6 @@
 from collections import deque
 from threading import Thread
 import datetime
-import logging
 
 class Evaluator(Thread):
     """Event driven class to evaluate timeseries data for change."""
@@ -23,13 +22,9 @@ class Evaluator(Thread):
 
     def run(self):
         while True:
-            timestamp, value = self.inq.get()
-            if isinstance(timestamp, datetime.time) and isinstance(value, float):
-                self.eval(timestamp, value)
-            else:
-                logging.info('Point data types are incorrect - %s, %s', timestamp, value)
+            p = self.inq.get()
+            self.eval(p.timestamp, p.value)
             self.inq.task_done()
-
 
     def eval(self, timestamp, value):
         """Apply evaluation logic to the data.
@@ -90,3 +85,25 @@ class Trader(Thread):
 
     def to_full_symbol(self):
         pass
+
+
+class Point():
+    """Class to encode a format for points when communicating between queues"""
+    def __init__(self, timestamp, value):
+        if isinstance(timestamp, datetime.time):
+            self._timestamp = timestamp
+        else:
+            raise TypeError(timestamp)
+
+        if isinstance(value, float):
+            self._value = value
+        else:
+            raise TypeError(value)
+
+    @property
+    def timestamp(self):
+        return self._timestamp
+
+    @property
+    def value(self):
+        return self._value
