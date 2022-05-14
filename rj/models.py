@@ -1,5 +1,7 @@
 from collections import deque
 from threading import Thread
+import datetime
+import logging
 
 class Evaluator(Thread):
     """Event driven class to evaluate timeseries data for change."""
@@ -18,6 +20,16 @@ class Evaluator(Thread):
         self.times = deque(maxlen=max_points)
         self.inq = inq
         self.outq = outq
+
+    def run(self):
+        while True:
+            time, value = self.inq.get()
+            if isinstance(time, datetime.time) and isinstance(value, float):
+                self.eval(time, value)
+            else:
+                logging.info('Point data types are incorrect - %s, %s', time, value)
+            self.inq.task_done()
+
 
     def eval(self, time, value):
         """Apply evaluation logic to the data.

@@ -38,3 +38,12 @@ class TestEvaluator:
 
     def test_percent_change_precision(self):
         assert Evaluator.percent_change(9, 15) == 0.667
+
+    @pytest.mark.parametrize('points, change', [(2, 0.1)])
+    def test_consuming_from_a_queue(self, evaluator, points, change):
+        e = evaluator
+        e.daemon = True # Stop when pytest exits.
+        e.inq.put([dt.now().time(), 1.0])
+        e.start()
+        assert len(e.values) == 1
+        assert len(e.times) == 1
