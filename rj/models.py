@@ -64,4 +64,17 @@ class Evaluator(Thread):
         """
         return round((current - start) / start, 3)
 
+
 class Trader(Thread):
+    """Event driven class to make trades"""
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        pass
+
+    def trade(self):
+        pass
+
+    def to_full_symbol(self):
+        pass
