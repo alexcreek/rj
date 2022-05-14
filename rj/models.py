@@ -2,7 +2,7 @@ from collections import deque
 from threading import Thread
 
 class Evaluator(Thread):
-    """Evaluate timeseries data for change."""
+    """Event driven class to evaluate timeseries data for change."""
     def __init__(self, max_points, change, inq, outq):
         """
         Args:
@@ -20,7 +20,7 @@ class Evaluator(Thread):
         self.outq = outq
 
     def eval(self, time, value):
-        """Apply the evaluation logic to the data.
+        """Apply evaluation logic to the data.
 
         Args:
             time (datetime.datetime.time): The point's time.
@@ -63,3 +63,5 @@ class Evaluator(Thread):
             float
         """
         return round((current - start) / start, 3)
+
+class Trader(Thread):
