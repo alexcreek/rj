@@ -107,3 +107,24 @@ class Point():
     @property
     def value(self):
         return self._value
+
+class Order():
+    """Class to encode a format for buy orders between queues"""
+    def __init__(self, putCall, last):
+        if isinstance(putCall, str):
+            self._putCall = putCall.lower()
+        else:
+            raise TypeError(putCall)
+
+        if isinstance(last, float):
+            self._last = last
+        else:
+            raise TypeError(last)
+
+    @property
+    def putCall(self):
+        return self._putCall
+
+    @property
+    def last(self):
+        return self._last

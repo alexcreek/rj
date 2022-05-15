@@ -2,7 +2,7 @@ from queue import Queue
 from datetime import datetime as dt
 import datetime
 import pytest
-from rj.models import Evaluator, Point
+from rj.models import Evaluator, Point, Order
 
 # pylint: skip-file
 # https://docs.pytest.org/en/6.2.x/getting-started.html
@@ -65,3 +65,16 @@ class TestPoint:
     def test_value_exceptions(self):
         with pytest.raises(TypeError):
             Point(dt.now().time().isoformat(), '1.0')
+
+class TestOrder:
+    def test_that_putcall_is_lowercase(self):
+        o = Order('BUY', 1.1)
+        assert o.putCall == 'buy'
+
+    def test_that_last_is_a_float(self):
+        o = Order('buy', 1.1)
+        assert isinstance(o.last, float)
+
+    def test_last_exceptions(self):
+        with pytest.raises(TypeError):
+            Order('buy', 1)
