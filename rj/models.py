@@ -53,10 +53,10 @@ class Evaluator(Thread):
         # Take positive and negative change_thresholds into account
         if self.change_threshold > 0:
             if changed >= self.change_threshold:
-                self.outq.put('call')
+                self.outq.put(Order('call', value))
         else:
             if changed <= self.change_threshold:
-                self.outq.put('put')
+                self.outq.put(Order('put', value))
 
     @staticmethod
     def percent_change(start, current):

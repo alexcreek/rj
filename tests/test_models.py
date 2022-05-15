@@ -2,6 +2,7 @@ from queue import Queue
 from datetime import datetime as dt
 import datetime
 import pytest
+import numpy as np
 from rj.models import Evaluator, Point, Order
 
 # pylint: skip-file
@@ -18,21 +19,21 @@ class TestEvaluator:
     @pytest.mark.parametrize('points, change', [(4, 0.3)])
     def test_positive_change(self, evaluator, points, change):
         e = evaluator
-        for value in range(10, 14):
+        for value in np.arange(10.0, 14.0):
             e.eval(dt.now().time(), value)
-        assert e.outq.get_nowait() == 'call'
+        assert e.outq.get_nowait().putCall == 'call'
 
     @pytest.mark.parametrize('points, change', [(4, -0.2)])
     def test_negative_change(self, evaluator, points, change):
         e = evaluator
-        for value in range(14, 10, -1):
+        for value in np.arange(14.0, 10.0, -1):
             e.eval(dt.now().time(), value)
-        assert e.outq.get_nowait() == 'put'
+        assert e.outq.get_nowait().putCall == 'put'
 
     @pytest.mark.parametrize('points, change', [(2, 0.1)])
     def test_that_maxpoints_is_honored(self, evaluator, points, change):
         e = evaluator
-        for value in [1, 1, 1]:
+        for value in [1.0, 1.0, 1.0]:
             e.eval(dt.now().time(), value)
         assert len(e.values) == 2
         assert len(e.times) == 2
