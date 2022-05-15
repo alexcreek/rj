@@ -12,6 +12,7 @@ def get_settings():
     """
     return {
         'days': int(os.getenv('DAYS', '14')),
+        'dte_range': int(os.getenv('DTE_RANGE', '1,4')),
         'ticker': os.getenv('TICKER', 'SPY').upper(),
         'points': int(os.getenv('POINTS', '10')),
         'change': float(os.getenv('CHANGE', '0.5')),
