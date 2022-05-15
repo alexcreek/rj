@@ -69,13 +69,13 @@ class TestPoint:
 
 class TestOrder:
     def test_that_putcall_is_lowercase(self):
-        o = Order('BUY', 1.1)
-        assert o.putCall == 'buy'
+        o = Order('CALL', 1.1)
+        assert o.putCall == 'call'
 
     def test_that_last_is_a_float(self):
-        o = Order('buy', 1.1)
+        o = Order('call', 1.1)
         assert isinstance(o.last, float)
 
     def test_last_exceptions(self):
         with pytest.raises(TypeError):
-            Order('buy', 1)
+            Order('call', 1)

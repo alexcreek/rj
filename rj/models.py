@@ -111,10 +111,10 @@ class Point():
 class Order():
     """Class to encode a format for buy orders between queues"""
     def __init__(self, putCall, last):
-        if isinstance(putCall, str):
+        if 'put' in putCall.lower() or 'call' in putCall.lower():
             self._putCall = putCall.lower()
         else:
-            raise TypeError(putCall)
+            raise ValueError(putCall)
 
         if isinstance(last, float):
             self._last = last
