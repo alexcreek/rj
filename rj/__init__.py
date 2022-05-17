@@ -1,45 +1,35 @@
 import os
 import sys
 from time import sleep
-from dotenv import load_dotenv
 import spivey
+from .models import Order
 
-def get_settings():
-    """Collect app settings from environment variables
+def configure():
+    """Collect app settings from environment variables.
 
     Returns:
         dict
     """
-    return {
-        'days': int(os.getenv('DAYS', '14')),
-        'dte_range': int(os.getenv('DTE_RANGE', '1,4')),
-        'ticker': os.getenv('TICKER', 'SPY').upper(),
-        'points': int(os.getenv('POINTS', '10')),
-        'change': float(os.getenv('CHANGE', '0.5')),
-        # I think order when there's a .5% change, not sure how by much time tho
-        'bracket': float(os.getenv('BRACKET', '0.2')),
-        # only use a limit and stop of.20, $bracket
-        'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
-        'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
-    }
-
-def assert_credentials_exist():
-    """Assert the required env vars exist in the environment"""
-    envvars = [
-        'CLIENT_ID', # tdameritrade
-        'REFRESH_TOKEN', # tdameritrade
-        'TD_ACCOUNT_ID', # tdameritrade
-        'TWILIO_ACCOUNT_SID',
-        'TWILIO_AUTH_TOKEN'
-    ]
-    for e in envvars:
-        does_envvar_exist(e)
-
-def does_envvar_exist(var):
     try:
-        os.environ[var]
+        return {
+            'capital': int(os.environ['CAPITAL']),
+            'days': int(os.getenv('DAYS', '14')),
+            'dte_min': int(os.getenv('DTE_MIN', '1')),
+            'dte_max': int(os.getenv('DTE_MAX', '4')),
+            'ticker': os.getenv('TICKER', 'SPY').upper(),
+            'points': int(os.getenv('POINTS', '10')),
+            'change': float(os.getenv('CHANGE', '0.5')),
+            'bracket': float(os.getenv('BRACKET', '0.2')),
+            'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
+            'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
+            'client_id': os.environ['CLIENT_ID'], # tdameritrade
+            'refresh_token': os.environ['REFRESH_TOKEN'], # tdameritrade
+            'td_account_id': os.environ['TD_ACCOUNT_ID'], # tdameritrade
+            'twilio_account_sid': os.environ['TWILIO_ACCOUNT_SID'],
+            'twilio_auth_token': os.environ['TWILIO_AUTH_TOKEN'],
+        }
     except KeyError as e:
-        print(f'{e} environment variable not found')
+        print(f'Config error: {e} environment variable not found')
         sys.exit(1)
 
 def main():
@@ -51,18 +41,6 @@ def main():
     Returns:
         Nothing yet
     """
-    load_dotenv()
-    assert_credentials_exist()
-
-    settings = get_settings()
-    c = spivey.Client()
-    while True:
-        # start tracking change
-        fetch_data(c, settings['ticker'])
-
-        # when the instance triggers, start munging the options
-        #c.options(ticker, days)
-        sleep(30)
 
 # TASKS
 # keep track of change
@@ -76,21 +54,6 @@ def text_me(msg):
     Args:
         msg (str): Body of the text message.
     """
-    pass
-
-def buy():
-    # when you buy, do the math for $bracket
-    # when you buy, convert to a full symbol
-    # when you buy,
-        # find the value of spy from the api
-            # we'll already have this data, duh
-        # find an exp within a range of 1dte to 5dte
-        # drops buy puts
-        # rises buy calls
-    pass
-
-def find_exp_in_dte_range(_min, _max):
-    """Return the first expiration from a range of dtes"""
     pass
 
 
