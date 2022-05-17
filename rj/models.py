@@ -1,6 +1,7 @@
 from collections import deque
 from threading import Thread
 import datetime
+import spivey
 
 class Evaluator(Thread):
     """Event driven class to evaluate timeseries data for change."""
@@ -74,17 +75,91 @@ class Evaluator(Thread):
 
 class Trader(Thread):
     """Event driven class to make trades"""
-    def __init__(self):
+    def __init__(self, config, inq):
         super().__init__()
+        self.client = spivey.Client()
+        self.config = config
+        self.inq = inq
+        self.putCall = str
+        self.last = float # Underlying ticker's price
+        self.strike = str
+        self.mark = float # Contract's price
+        self.limit = float
+        self.stop = float
+        self.exp = str
+        self.contracts = dict
 
     def run(self):
-        pass
+        while True:
+            order = self.inq.get()
+            self.putCall = order.putCall
+            self.last = order.last
+
+            # Set instance properties that are dependent on last
+            self.set_strike()
+            self.set_mark()
+            self.set_limit()
+            self.set_stop()
+
+            # Set exp and contracts
+            self.find_exp_by_dte()
+
+            self.trade()
+            self.inq.task_done()
 
     def trade(self):
-        pass
+        """Execute a trade"""
+        contract_symbol = self.client.to_full_symbol(
+            self.config['ticker'],
+            self.exp,
+            self.putCall,
+            self.strike
+        )
 
-    def to_full_symbol(self):
-        pass
+        self.client.buy_oco(
+            self.config['capital'],
+            contract_symbol,
+            self.mark,
+            self.limit,
+            self.stop,
+        )
+
+    def set_strike(self):
+        """Set strike using last.
+
+        Strike is used as the key for contracts. As such, it must be a string with .0 suffixed.
+        """
+        self.strike = f'{str(round(self.last))}.0'
+
+    def set_mark(self):
+        """Set mark using contracts and strike."""
+        self.mark = self.contracts[self.strike][0]['mark'] # type: ignore
+
+    def set_limit(self):
+        """Set limit using mark and self.config['bracket']"""
+        self.limit = round(self.mark + (self.mark * self.config['bracket']), 4)
+
+    def set_stop(self):
+        """Set stop using mark and self.config['bracket']"""
+        self.stop = self.mark - (self.mark * self.config['bracket'])
+
+    def find_exp_by_dte(self):
+        """Find the first expiration given a range of dtes"""
+        options = self.client.options(
+            self.config['ticker'],
+            self.config['days']
+        )
+
+        _key = f'{self.putCall}ExpDateMap'
+
+        for contract in options[_key].keys():
+            exp, dte = contract.split(':')
+            if int(dte) >= self.config['dte_min'] and int(dte) <= self.config['dte_max']:
+                print(f'{exp} dte contract found - {exp}')
+                self.exp = exp
+                self.contracts = options[_key]['contract']
+                return
+            raise RuntimeError('Contracts with dte between min and max not found')
 
 
 class Point():

@@ -3,7 +3,8 @@ from datetime import datetime as dt
 import datetime
 import pytest
 import numpy as np
-from rj.models import Evaluator, Point, Order
+from rj.models import Evaluator, Point, Order, Trader
+import rj
 
 # pylint: skip-file
 # https://docs.pytest.org/en/6.2.x/getting-started.html
@@ -12,8 +13,23 @@ from rj.models import Evaluator, Point, Order
 # https://docs.pytest.org/en/6.2.x/capture.html
 
 @pytest.fixture
+def config(monkeypatch):
+    monkeypatch.setenv('CAPITAL', '1000')
+    monkeypatch.setenv('CLIENT_ID', 'asdf')
+    monkeypatch.setenv('REFRESH_TOKEN', 'asdf')
+    monkeypatch.setenv('TD_ACCOUNT_ID', 'asdf')
+    monkeypatch.setenv('TWILIO_ACCOUNT_SID', 'asdf')
+    monkeypatch.setenv('TWILIO_AUTH_TOKEN', 'asdf')
+    return rj.configure()
+
+@pytest.fixture
 def evaluator(points, change):
     return Evaluator(points, change, Queue(), Queue())
+
+@pytest.fixture
+def trader(config):
+    return Trader(config, Queue())
+
 
 class TestEvaluator:
     @pytest.mark.parametrize('points, change', [(4, 0.3)])
@@ -79,3 +95,37 @@ class TestOrder:
     def test_last_exceptions(self):
         with pytest.raises(TypeError):
             Order('call', 1)
+
+class TestTrader:
+    def test_set_strike(self, trader):
+        t = trader
+        t.last = 400.4
+        t.set_strike()
+        assert t.strike == '400.0'
+
+    def test_set_mark(self, trader):
+        t = trader
+        t.contracts = {'400.0': [{'mark': 0.55}]}
+        t.strike = '400.0'
+        t.set_mark()
+        assert t.mark == 0.55
+
+    def test_set_limit(self, trader, monkeypatch):
+        t = trader
+        t.mark = 0.55
+        monkeypatch.setitem(trader.config, 'bracket', 0.5)
+        t.set_limit()
+        assert t.limit == 0.825
+
+    def test_set_stop(self, trader, monkeypatch):
+        t = trader
+        t.mark = 0.55
+        monkeypatch.setitem(trader.config, 'bracket', 0.5)
+        t.set_stop()
+        assert t.stop == 0.275
+
+    def test_find_exp_by_dte(self):
+        assert False
+
+    def test_trade(default):
+        assert False
