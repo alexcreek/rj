@@ -18,6 +18,7 @@ pytest = "==6.2.*"
 pytest-cov = "==2.12.*"
 pylint = "==2.9.*"
 ipython = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.8"
