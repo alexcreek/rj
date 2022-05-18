@@ -1,5 +1,6 @@
 from collections import deque
 from threading import Thread
+from time import sleep
 import datetime
 import spivey
 from twilio.rest import Client
@@ -107,6 +108,7 @@ class Trader(Thread):
 
             self.trade()
             self.inq.task_done()
+            self.cooldown()
 
     def trade(self):
         """Execute a trade"""
@@ -175,6 +177,12 @@ class Trader(Thread):
             from_ = self.config['twilio_from'],
             to = self.config['twilio_to'],
         )
+
+    def cooldown(self, minutes=30):
+        """Provide backoff after executing an order to prevent repeated buys for the same change"""
+        # if this doesn't work and open trades stack up,
+        # try polling open orders every n minutes instead
+        sleep(minutes * 60)
 
 
 class Point():

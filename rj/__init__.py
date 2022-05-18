@@ -66,7 +66,3 @@ def fetch_price(client, ticker):
 # dont order before 10am and after 4pm
 # REMEMBER THE TEST DATA IS PER MINUTE BUT WE'RE GONNA HIT THE API EVERY 30S
 
-# add a backoff after triggering so there aren't repeated buys for the same change
-    # poll open orders every n minutes
-def cooldown():
-    pass
