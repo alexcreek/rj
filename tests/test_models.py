@@ -3,6 +3,7 @@ from datetime import datetime as dt
 import datetime
 import pytest
 import numpy as np
+import spivey
 from rj.models import Evaluator, Point, Order, Trader
 import rj
 
@@ -12,6 +13,7 @@ import rj
 # https://docs.pytest.org/en/6.2.x/fixture.html
 # https://docs.pytest.org/en/6.2.x/capture.html
 
+### Fixtures
 @pytest.fixture
 def config(monkeypatch):
     monkeypatch.setenv('CAPITAL', '1000')
@@ -30,7 +32,26 @@ def evaluator(points, change):
 def trader(config):
     return Trader(config, Queue())
 
+@pytest.fixture
+def stub_options_data(monkeypatch):
+    """Monkeypatch spivey to return fake data for options()"""
+    def mock_options(*args):
+        return {
+            'putExpDateMap': {
+                '2022-05-16:1': [{'mark': 0.50}],
+                '2022-05-18:3': [{'mark': 0.55}],
+                '2022-05-20:5': [{'mark': 0.60}],
+                },
+            'callExpDateMap': {
+                '2022-05-16:1': [{'mark': 1.50}],
+                '2022-05-18:3': [{'mark': 1.55}],
+                '2022-05-20:5': [{'mark': 1.60}],
+                }
+        }
 
+    monkeypatch.setattr(spivey.Client, "options", mock_options)
+
+### Tests
 class TestEvaluator:
     @pytest.mark.parametrize('points, change', [(4, 0.3)])
     def test_positive_change(self, evaluator, points, change):
@@ -124,8 +145,31 @@ class TestTrader:
         t.set_stop()
         assert t.stop == 0.275
 
-    def test_find_exp_by_dte(self):
-        assert False
+    def test_find_exp_by_dte_for_puts(self, trader, stub_options_data, monkeypatch):
+        t = trader
+        monkeypatch.setitem(t.config, 'dte_min', 3)
+        monkeypatch.setitem(t.config, 'dte_max', 5)
+        t.putCall = 'put'
+        t.find_exp_by_dte()
+        assert t.exp == '2022-05-18'
+        assert t.contracts[0]['mark'] == 0.55
+
+    def test_find_exp_by_dte_for_calls(self, trader, stub_options_data, monkeypatch):
+        t = trader
+        monkeypatch.setitem(t.config, 'dte_min', 1)
+        monkeypatch.setitem(t.config, 'dte_max', 5)
+        t.putCall = 'call'
+        t.find_exp_by_dte()
+        assert t.exp == '2022-05-16'
+        assert t.contracts[0]['mark'] == 1.50
+
+    def test_not_finding_exps(self, trader, stub_options_data, monkeypatch):
+        with pytest.raises(RuntimeError):
+            t = trader
+            monkeypatch.setitem(t.config, 'dte_min', 10)
+            monkeypatch.setitem(t.config, 'dte_max', 11)
+            t.putCall = 'put'
+            t.find_exp_by_dte()
 
     def test_trade(default):
         assert False

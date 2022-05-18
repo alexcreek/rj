@@ -157,9 +157,9 @@ class Trader(Thread):
             if int(dte) >= self.config['dte_min'] and int(dte) <= self.config['dte_max']:
                 print(f'{exp} dte contract found - {exp}')
                 self.exp = exp
-                self.contracts = options[_key]['contract']
+                self.contracts = options[_key][contract]
                 return
-            raise RuntimeError('Contracts with dte between min and max not found')
+        raise RuntimeError('Contracts with dte between min and max not found')
 
 
 class Point():
