@@ -2,6 +2,7 @@ from collections import deque
 from threading import Thread
 import datetime
 import spivey
+from twilio.rest import Client
 
 class Evaluator(Thread):
     """Event driven class to evaluate timeseries data for change."""
@@ -160,6 +161,20 @@ class Trader(Thread):
                 self.contracts = options[_key][contract]
                 return
         raise RuntimeError('Contracts with dte between min and max not found')
+
+    def notify(self, msg):
+        """Send an sms via twilio.
+
+        Args:
+            msg (str): Body of the message.
+        """
+        client = Client(self.config['twilio_account_sid'], self.config['twilio_auth_token'])
+
+        client.messages.create(
+            body = msg,
+            from_ = self.config['twilio_from'],
+            to = self.config['twilio_to'],
+        )
 
 
 class Point():

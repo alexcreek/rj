@@ -47,15 +47,6 @@ def main():
 # order
 # notify
 
-# when you order, text me
-def text_me(msg):
-    """Send an sms via twilio
-
-    Args:
-        msg (str): Body of the text message.
-    """
-    pass
-
 
 def fetch_price(client, ticker):
     """Retrive price for a given asset
