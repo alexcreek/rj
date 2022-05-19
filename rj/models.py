@@ -2,6 +2,7 @@ from collections import deque
 from threading import Thread
 from time import sleep
 import datetime
+import logging
 from datetime import datetime as dt
 import spivey
 from twilio.rest import Client
@@ -46,6 +47,7 @@ class Evaluator(Thread):
 
         # Evaluate using the values of the first and last points
         changed = self.percent_change(self.values[0], self.values[-1])
+        logging.debug('%s change observed', changed)
 
         #   -.1  <=  -.2 - do nothing
         #   -.2  <=  -.2 - buy
@@ -58,9 +60,11 @@ class Evaluator(Thread):
         if self.change_threshold > 0:
             if changed >= self.change_threshold:
                 self.outq.put(Order('call', value))
+                logging.info('call triggered by %s change', changed)
         else:
             if changed <= self.change_threshold:
                 self.outq.put(Order('put', value))
+                logging.info('put triggered by %s change', changed)
 
     @staticmethod
     def percent_change(start, current):
@@ -132,6 +136,9 @@ class Trader(Thread):
             self.stop,
         )
 
+        logging.info('trade executed %s', contract_symbol)
+
+
     def set_strike(self):
         """Set strike using last.
 
@@ -198,7 +205,9 @@ class Poller(Thread):
         self.outq = outq
 
     def fetch_price(self):
-        return self.client.underlying(self.config['ticker'])
+        p = self.client.underlying(self.config['ticker'])
+        logging.info('%s %s', self.config['ticker'], p)
+        return p
 
     def run(self):
         while True:
