@@ -2,8 +2,7 @@ import os
 import sys
 import logging
 from queue import Queue
-import spivey
-from .models import Order, Point, Poller, Evaluator, Trader
+from .models import Poller, Evaluator, Trader
 
 def configure():
     """Collect app settings from environment variables.
