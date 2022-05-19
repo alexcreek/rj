@@ -1,8 +1,9 @@
 import os
 import sys
-from time import sleep
+import logging
+from queue import Queue
 import spivey
-from .models import Order
+from .models import Order, Point, Poller, Evaluator, Trader
 
 def configure():
     """Collect app settings from environment variables.
@@ -34,11 +35,23 @@ def configure():
         sys.exit(1)
 
 def main():
-    pass
+    logging.basicConfig(format='%(asctime)s %(message)s',
+        datefmt='%d/%B/%Y %I:%M:%S', level=logging.INFO)
 
-# TASKS
-# keep track of change
-# order
-# notify
+    config = configure()
+    pointq = Queue()
+    orderq = Queue()
+
+    # Poll
+    p = Poller(config, pointq)
+    p.start()
+
+    # Evaluate
+    e = Evaluator(config['points'], config['change'], pointq, orderq)
+    e.start()
+
+    # Trade
+    t = Trader(config, orderq)
+    t.start()
 
 # dont order before 10am and after 4pm
