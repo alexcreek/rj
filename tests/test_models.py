@@ -4,7 +4,7 @@ import datetime
 import pytest
 import numpy as np
 import spivey
-from rj.models import Evaluator, Point, Order, Trader
+from rj.models import Evaluator, Point, Order, Trader, Poller
 import rj
 
 # pylint: skip-file
@@ -50,6 +50,15 @@ def stub_options_data(monkeypatch):
         }
 
     monkeypatch.setattr(spivey.Client, 'options', mock_options)
+
+@pytest.fixture
+def poller(config, monkeypatch):
+    def underlying(*args):
+        return 400.1
+    monkeypatch.setattr(spivey.Client, 'underlying', underlying)
+    monkeypatch.setitem(config, 'ticker', 'SPY')
+    monkeypatch.setitem(config, 'polling_interval', '1')
+    return Poller(config, Queue())
 
 ### Tests
 class TestEvaluator:
@@ -185,3 +194,15 @@ class TestTrader:
         t.limit = 0.50
         t.stop = 0.50
         t.trade()
+
+    class TestPoller:
+        def test_getting_a_price(self, poller):
+            p = poller
+            assert p.fetch_price() ==  400.1
+
+        def test_publishing_a_price(self, poller):
+            p = poller
+            p.daemon = True # Stop when pytest exits.
+            p.start()
+            point = p.outq.get()
+            assert point.value == 400.1

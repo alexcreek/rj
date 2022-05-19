@@ -2,6 +2,7 @@ from collections import deque
 from threading import Thread
 from time import sleep
 import datetime
+from datetime import datetime as dt
 import spivey
 from twilio.rest import Client
 
@@ -187,6 +188,24 @@ class Trader(Thread):
         # if this doesn't work and open trades stack up,
         # try polling open orders every n minutes instead
         sleep(minutes * 60)
+
+
+class Poller(Thread):
+    def __init__(self, config, outq):
+        super().__init__()
+        self.client = spivey.Client()
+        self.config = config
+        self.outq = outq
+
+    def fetch_price(self):
+        return self.client.underlying(self.config['ticker'])
+
+    def run(self):
+        while True:
+            last = self.fetch_price()
+            if last:
+                self.outq.put(Point(dt.utcnow().time(), last))
+            sleep(self.config['polling_interval'])
 
 
 class Point():
