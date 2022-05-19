@@ -120,7 +120,7 @@ class Trader(Thread):
             self.config['ticker'],
             self.exp,
             self.putCall,
-            self.strike
+            float(self.strike)
         )
 
         self.client.buy_oco(

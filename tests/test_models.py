@@ -49,7 +49,7 @@ def stub_options_data(monkeypatch):
                 }
         }
 
-    monkeypatch.setattr(spivey.Client, "options", mock_options)
+    monkeypatch.setattr(spivey.Client, 'options', mock_options)
 
 ### Tests
 class TestEvaluator:
@@ -171,5 +171,17 @@ class TestTrader:
             t.putCall = 'put'
             t.find_exp_by_dte()
 
-    def test_trade(default):
-        assert False
+    # This test doesn't entirely make sense because there's nothing to assert, but it's here.
+    def test_making_a_trade(self, trader, monkeypatch):
+        def buy_oco(*args):
+            return
+        monkeypatch.setattr(spivey.Client, 'buy_oco', buy_oco)
+
+        t = trader
+        t.exp = '18 may 22'
+        t.putCall = 'put'
+        t.strike = '400.0'
+        t.mark = 0.50
+        t.limit = 0.50
+        t.stop = 0.50
+        t.trade()
