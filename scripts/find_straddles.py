@@ -3,24 +3,19 @@ import argparse
 from datetime import datetime as dt
 from dotenv import load_dotenv
 from dateutil.parser import parse as date_parse
+from time import sleep
 import spivey
-from apscheduler.schedulers.blocking import BlockingScheduler
-from datadog import initialize, api
-
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Poll live options contracts looking for puts and calls around the same price')
-    parser.add_argument('-t', '--ticker', help='ticker', default="$VIX.X")
+    parser.add_argument('-t', '--ticker', help='ticker', required=True)
     parser.add_argument('-v', '--verbose', help='enable verbose logging', action='store_true')
     parser.add_argument('-n', '--notify', help='notify datadog on findings', action='store_true')
     parser.add_argument('-e', '--exp', help='specific expiration to search for', default='')
     return parser.parse_args()
 
 def notify(msg, ticker, exp, strike):
-    initialize()
-    tags=[f"source:{__file__.rsplit('/', maxsplit=1)[-1]}",
-            f'ticker:{ticker}', f'strike:{strike}', f'exp:{exp}']
-    api.Event.create(title='Straddle Found', text=msg, tags=tags)
+    pass
 
 def main(ticker, client, _notify, _exp, verbose):
     load_dotenv()
@@ -75,12 +70,9 @@ if __name__ == '__main__':
     print(f"Started {__file__.rsplit('/', maxsplit=1)[-1]}")
     args = parse_arguments()
     c = spivey.Client()
-    sched = BlockingScheduler()
-    sched.add_job(
-        main, args=(args.ticker.upper(), c, args.notify, args.exp.upper(), args.verbose),
-        trigger='cron', second='*/30'
-    )
     try:
-        sched.start()
+        while True:
+            main(args.ticker.upper(), c, args.notify, args.exp.upper(), args.verbose)
+            sleep(30)
     except KeyboardInterrupt:
         pass
