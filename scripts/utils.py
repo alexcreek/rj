@@ -14,37 +14,6 @@ def change(start, current):
     """
     return round((current - start) / start, 4)
 
-def timestamps_per_minute(days, start=False):
-    """Generate timestamps at 1 minute intervals.
-
-    Args:
-        days (int): The number of days to create timestamps for.
-
-    Returns:
-        list(dict(list(dict)))
-    """
-
-    if start:
-        _start = parse(start)
-    else:
-        _start = dt.utcnow()
-
-
-    ret = []
-    for i in range(days):
-        start = dt.isoformat(
-            _start.replace(hour=13, minute=30, second=0, microsecond=0) - timedelta(days=i)
-        )
-        _stop = _start.replace(hour=13, minute=31, second=0, microsecond=0) - timedelta(days=i)
-
-        ret.append({i: []})
-
-        for j in range(390):
-            stop = dt.isoformat(_stop + timedelta(minutes=j))
-            ret[-1][i].append({'start': f'{start}Z', 'stop': f'{stop}Z'})
-
-    return ret
-
 def timestamps_per_day(days, start):
     """Generate timestamps at 1 day intervals.
 
