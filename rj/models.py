@@ -47,7 +47,7 @@ class Evaluator(Thread):
 
         # Evaluate using the values of the first and last points
         changed = self.percent_change(self.values[0], self.values[-1])
-        logging.debug('%s change observed', changed)
+        logging.info('%s change observed', changed)
 
         #   -.1  <=  -.2 - do nothing
         #   -.2  <=  -.2 - buy
@@ -101,17 +101,19 @@ class Trader(Thread):
             order = self.inq.get()
             self.putCall = order.putCall
             self.last = order.last
-
-            # Set instance properties that are dependent on last
             self.set_strike()
-            self.set_mark()
-            self.set_limit()
-            self.set_stop()
 
             # Set exp and contracts
             self.find_exp_by_dte()
 
-            self.trade()
+            # These are used by trade(). They depend on find_exp_by_dte().
+            self.set_mark()
+            self.set_limit()
+            self.set_stop()
+
+            if 'ENABLED' in self.config['live_trading']:
+                self.trade()
+
             msg = f"Trade executed. \
                 ${self.config['capital']} on {self.exp} {self.strike} {self.putCall} \
                 @ {self.mark}, limit @ {self.limit}, stop @ {self.stop}"

@@ -18,11 +18,12 @@ def configure():
             'dte_max': int(os.getenv('DTE_MAX', '4')),
             'ticker': os.getenv('TICKER', 'SPY').upper(),
             'points': int(os.getenv('POINTS', '10')),
-            'change': float(os.getenv('CHANGE', '0.5')),
+            'change': float(os.getenv('CHANGE', '0.005')),
             'bracket': float(os.getenv('BRACKET', '0.2')),
             'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
             'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
             'polling_interval': int(os.getenv('POLLING_INTERVAL', '30')),
+            'live_trading': os.getenv('LIVE_TRADING', 'ENABLED').upper(),
             'client_id': os.environ['CLIENT_ID'], # tdameritrade
             'refresh_token': os.environ['REFRESH_TOKEN'], # tdameritrade
             'td_account_id': os.environ['TD_ACCOUNT_ID'], # tdameritrade
@@ -53,4 +54,4 @@ def main():
     t = Trader(config, orderq)
     t.start()
 
-# dont order before 10am and after 4pm
+# dont order before 10am and after 3pm
