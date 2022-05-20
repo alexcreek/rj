@@ -6,7 +6,6 @@ from datetime import timedelta
 from dateutil.parser import parse
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient
-import utils
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Determine the fair price for a VIX contract')
@@ -103,6 +102,57 @@ def get_current_mark(client, exp, putCall, strike):
         m = round(df['_value'][0], 2)
     return m
 
+def to_ttl(exp, start=None):
+    """Return the number of days until a date is reached.
+
+    Args:
+        exp (str): The target date
+        start (datetime.datetime): The day to start from
+
+    Returns:
+        integer
+    """
+    start_date = dt.now()
+    if start:
+        start_date = start
+    return dt.strptime(exp, '%d %b %y') - start_date
+
+def to_vmr(vix, mark):
+    """Return the vix to mark ratio
+
+    Args:
+        vix (float): The vix.
+        mark (float): The mark.
+
+    Returns:
+        float
+    """
+    if vix and mark:
+        return round(vix / mark, 2)
+    return 0
+
+def moneyness(putCall, vix, strike):
+    """Return how far in or out of the money a contract is
+
+    Args:
+        vix (float): The vix.
+        strike (float): A contract's strike.
+
+    Returns:
+        string
+    """
+    diff = round(strike - vix)
+    if 'call' in putCall:
+        diff = round(vix - strike)
+
+    if diff > 0:
+        ness = 'ITM'
+    elif diff < 0:
+        ness = 'OTM'
+        diff = diff * -1
+    else:
+        ness = 'ATM'
+    return f'{ness} {diff}'
 
 def main(exp, putCall, strike, vix, mark, start, verbose=False):
     # pylint: disable=too-many-locals
@@ -131,7 +181,7 @@ def main(exp, putCall, strike, vix, mark, start, verbose=False):
     _start = None
     if start:
         _start = parse(start)
-    ttl = utils.to_ttl(exp.strip(), _start)
+    ttl = to_ttl(exp.strip(), _start)
 
     print(f'[*] {exp} expires in {ttl.days} days')
     print(f'[*] Searching for {putCall}s @ {strike} with a {ttl.days} day ttl')
@@ -143,9 +193,9 @@ def main(exp, putCall, strike, vix, mark, start, verbose=False):
 
         _vix = query_vix(client, lookback)
         _mark = query_mark(client, lookback, _exp, putCall, strike)
-        print(f'    {_exp}\t{_vix}\t{_mark}\t{utils.to_vmr(_vix, _mark)}\t{utils.moneyness(putCall, _vix, strike)}')
+        print(f'    {_exp}\t{_vix}\t{_mark}\t{to_vmr(_vix, _mark)}\t{moneyness(putCall, _vix, strike)}')
 
-    print(f'\n    {exp}\t{vix}\t{mark}\t{utils.to_vmr(vix, mark)}\t{utils.moneyness(putCall, vix, strike)}')
+    print(f'\n    {exp}\t{vix}\t{mark}\t{to_vmr(vix, mark)}\t{moneyness(putCall, vix, strike)}')
 
 if __name__ == '__main__':
     args = parse_arguments()

@@ -120,58 +120,6 @@ def weekday(df):
 def date(df):
     return df.iloc[-1]['_time'].date()
 
-def to_ttl(exp, start=None):
-    """Return the number of days until a date is reached.
-
-    Args:
-        exp (str): The target date
-        start (datetime.datetime): The day to start from
-
-    Returns:
-        integer
-    """
-    start_date = dt.now()
-    if start:
-        start_date = start
-    return dt.strptime(exp, '%d %b %y') - start_date
-
-def to_vmr(vix, mark):
-    """Return the vix to mark ratio
-
-    Args:
-        vix (float): The vix.
-        mark (float): The mark.
-
-    Returns:
-        float
-    """
-    if vix and mark:
-        return round(vix / mark, 2)
-    return 0
-
-def moneyness(putCall, vix, strike):
-    """Return how far in or out of the money a contract is
-
-    Args:
-        vix (float): The vix.
-        strike (float): A contract's strike.
-
-    Returns:
-        string
-    """
-    diff = round(strike - vix)
-    if 'call' in putCall:
-        diff = round(vix - strike)
-
-    if diff > 0:
-        ness = 'ITM'
-    elif diff < 0:
-        ness = 'OTM'
-        diff = diff * -1
-    else:
-        ness = 'ATM'
-    return f'{ness} {diff}'
-
 def stats(df):
     """Generate basic finance stats for a single day.
 
