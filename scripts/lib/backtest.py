@@ -26,7 +26,7 @@ def query_timeseries(start, exp, strike, putCall):
                         |> filter(fn: (r) => r.strike == "{strike}.0")
                         |> filter(fn: (r) => r.putCall == "{putCall}")
                         |> filter(fn: (r) => r._field == "mark")
-                        |> aggregateWindow(every: 1m, fn: mean, createEmpty: false)
+                        |> aggregateWindow(every: 30s, fn: mean, createEmpty: false)
                  """
                 return query_api.query_data_frame(query)
 
