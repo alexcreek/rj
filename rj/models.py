@@ -77,7 +77,7 @@ class Evaluator(Thread):
         Returns:
             float
         """
-        return round((current - start) / start, 3)
+        return round((current - start) / start, 4)
 
 
 class Trader(Thread):
