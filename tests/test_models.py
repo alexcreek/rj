@@ -85,7 +85,7 @@ class TestEvaluator:
         assert len(e.times) == 2
 
     def test_percent_change_precision(self):
-        assert Evaluator.percent_change(9, 15) == 0.667
+        assert Evaluator.percent_change(9, 15) == 0.6667
 
     @pytest.mark.parametrize('points, change', [(2, 0.1)])
     def test_consuming_from_a_queue(self, evaluator, points, change):
