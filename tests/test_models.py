@@ -26,7 +26,7 @@ def config(monkeypatch):
 
 @pytest.fixture
 def evaluator(points, change):
-    return Evaluator(points, change, Queue(), Queue())
+    return Evaluator(points, change, 2, Queue(), Queue())
 
 @pytest.fixture
 def trader(config):
@@ -93,6 +93,34 @@ class TestEvaluator:
         e.daemon = True # Stop when pytest exits.
         e.inq.put(Point(dt.now().time(), 1.0))
         e.start()
+        assert len(e.values) == 1
+        assert len(e.times) == 1
+
+    @pytest.mark.parametrize('points, change', [(4, 0.3)])
+    def test_that_cooldown_purges_data(self, evaluator, points, change):
+        e = evaluator
+        for value in np.arange(10.0, 14.0):
+            e.eval(dt.utcnow().time(), value)
+        assert len(e.values) == 0
+        assert len(e.times) == 0
+
+    @pytest.mark.parametrize('points, change', [(4, 0.3)])
+    def test_that_cooldown_prevents_getting_new_data(self, evaluator, points, change):
+        e = evaluator
+        for value in np.arange(10.0, 14.0):
+            e.eval(dt.utcnow().time(), value)
+        for value in np.arange(10.0, 12.0):
+            e.eval(dt.utcnow().time(), value)
+        assert len(e.values) == 0
+        assert len(e.times) == 0
+
+    @pytest.mark.parametrize('points, change', [(4, 0.3)])
+    def test_that_new_data_is_collected_after_cooldown_is_over(self, evaluator, points, change):
+        e = evaluator
+        for value in np.arange(10.0, 14.0):
+            e.eval(dt.utcnow().time(), value)
+        for value in np.arange(10.0, 13.0):
+            e.eval(dt.utcnow().time(), value)
         assert len(e.values) == 1
         assert len(e.times) == 1
 

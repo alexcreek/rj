@@ -9,11 +9,12 @@ from twilio.rest import Client
 
 class Evaluator(Thread):
     """Event driven class to evaluate timeseries data for change."""
-    def __init__(self, max_points, change, inq, outq):
+    def __init__(self, max_points, change, cooldown_points, inq, outq):
         """
         Args:
             max_points (int): The max number of points to evaluate.
             change (float): The amount of change to action on.
+            cooldown_points (int): The amount of points to ignore before evaluating again after a trigger.
             inq (Queue): Queue to consume from.
             outq (Queue): Queue to publish to.
         """
@@ -22,6 +23,8 @@ class Evaluator(Thread):
         self.change_threshold = change
         self.values = deque(maxlen=max_points)
         self.times = deque(maxlen=max_points)
+        self.cooldown_points = cooldown_points
+        self.cooldown_counter = 0
         self.inq = inq
         self.outq = outq
 
@@ -38,6 +41,10 @@ class Evaluator(Thread):
             timestamp (datetime.datetime.time): The point's time.
             value (float):  The point's value.
         """
+
+        if self.cooldown_counter:
+            self.cooldown_counter -= 1
+            return
         self.values.append(value)
         self.times.append(timestamp)
 
@@ -61,10 +68,17 @@ class Evaluator(Thread):
             if changed >= self.change_threshold:
                 self.outq.put(Order('call', value))
                 logging.info('call triggered by %s change', changed)
+                self.cooldown()
         else:
             if changed <= self.change_threshold:
                 self.outq.put(Order('put', value))
                 logging.info('put triggered by %s change', changed)
+                self.cooldown()
+
+    def cooldown(self):
+        self.cooldown_counter = self.cooldown_points
+        self.values.clear()
+        self.times.clear()
 
     @staticmethod
     def percent_change(start, current):
@@ -119,7 +133,6 @@ class Trader(Thread):
                 @ {self.mark}, limit @ {self.limit}, stop @ {self.stop}"
             self.notify(msg)
             self.inq.task_done()
-            self.cooldown()
 
     def trade(self):
         """Execute a trade"""
@@ -191,12 +204,6 @@ class Trader(Thread):
             from_ = self.config['twilio_from'],
             to = self.config['twilio_to'],
         )
-
-    def cooldown(self, minutes=30):
-        """Provide backoff after executing an order to prevent repeated buys for the same change"""
-        # if this doesn't work and open trades stack up,
-        # try polling open orders every n minutes instead
-        sleep(minutes * 60)
 
 
 class Poller(Thread):

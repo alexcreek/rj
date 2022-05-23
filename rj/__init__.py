@@ -17,12 +17,13 @@ def configure():
             'dte_min': int(os.getenv('DTE_MIN', '1')),
             'dte_max': int(os.getenv('DTE_MAX', '4')),
             'ticker': os.getenv('TICKER', 'SPY').upper(),
-            'points': int(os.getenv('POINTS', '10')),
-            'change': float(os.getenv('CHANGE', '0.005')),
+            'points': int(os.getenv('POINTS', '4')),
+            'change': float(os.getenv('CHANGE', '0.0025')),
             'bracket': float(os.getenv('BRACKET', '0.2')),
             'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
             'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
             'polling_interval': int(os.getenv('POLLING_INTERVAL', '30')),
+            'cooldown_points': int(os.getenv('COOLDOWN_POINTS', '60')),
             'live_trading': os.getenv('LIVE_TRADING', 'ENABLED').upper(),
             'client_id': os.environ['CLIENT_ID'], # tdameritrade
             'refresh_token': os.environ['REFRESH_TOKEN'], # tdameritrade
@@ -47,7 +48,8 @@ def main():
     p.start()
 
     # Evaluate
-    e = Evaluator(config['points'], config['change'], pointq, orderq)
+    e = Evaluator(config['points'], config['change'],
+            config['cooldown_points'], pointq, orderq)
     e.start()
 
     # Trade
