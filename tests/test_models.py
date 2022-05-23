@@ -57,7 +57,7 @@ def poller(config, monkeypatch):
         return 400.1
     monkeypatch.setattr(spivey.Client, 'underlying', underlying)
     monkeypatch.setitem(config, 'ticker', 'SPY')
-    monkeypatch.setitem(config, 'polling_interval', '1')
+    monkeypatch.setitem(config, 'polling_interval', 1)
     return Poller(config, Queue())
 
 ### Tests
