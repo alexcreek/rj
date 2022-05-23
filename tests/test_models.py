@@ -195,14 +195,14 @@ class TestTrader:
         t.stop = 0.50
         t.trade()
 
-    class TestPoller:
-        def test_getting_a_price(self, poller):
-            p = poller
-            assert p.fetch_price() ==  400.1
+class TestPoller:
+    def test_getting_a_price(self, poller):
+        p = poller
+        assert p.fetch_price() ==  400.1
 
-        def test_publishing_a_price(self, poller):
-            p = poller
-            p.daemon = True # Stop when pytest exits.
-            p.start()
-            point = p.outq.get()
-            assert point.value == 400.1
+    def test_publishing_a_price(self, poller):
+        p = poller
+        p.daemon = True # Stop when pytest exits.
+        p.start()
+        point = p.outq.get()
+        assert point.value == 400.1
