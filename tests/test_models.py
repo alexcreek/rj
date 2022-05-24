@@ -173,14 +173,14 @@ class TestTrader:
         t.mark = 0.55
         monkeypatch.setitem(trader.config, 'bracket', 0.5)
         t.set_limit()
-        assert t.limit == 0.825
+        assert t.limit == 0.83
 
     def test_set_stop(self, trader, monkeypatch):
         t = trader
         t.mark = 0.55
         monkeypatch.setitem(trader.config, 'bracket', 0.5)
         t.set_stop()
-        assert t.stop == 0.275
+        assert t.stop == 0.28
 
     def test_find_exp_by_dte_for_puts(self, trader, stub_options_data, monkeypatch):
         t = trader

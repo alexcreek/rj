@@ -166,11 +166,11 @@ class Trader(Thread):
 
     def set_limit(self):
         """Set limit using mark and self.config['bracket']"""
-        self.limit = round(self.mark + (self.mark * self.config['bracket']), 4)
+        self.limit = round(self.mark + (self.mark * self.config['bracket']), 2)
 
     def set_stop(self):
         """Set stop using mark and self.config['bracket']"""
-        self.stop = self.mark - (self.mark * self.config['bracket'])
+        self.stop = round(self.mark - (self.mark * self.config['bracket']), 2)
 
     def find_exp_by_dte(self):
         """Find the first expiration given a range of dtes"""
