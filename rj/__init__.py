@@ -23,7 +23,7 @@ def configure():
             'twilio_from': os.getenv('TWILIO_FROM', '+1234567890'),
             'twilio_to': os.getenv('TWILIO_TO', '+1234567890'),
             'polling_interval': int(os.getenv('POLLING_INTERVAL', '30')),
-            'cooldown_points': int(os.getenv('COOLDOWN_POINTS', '60')),
+            'cooldown_points': int(os.getenv('COOLDOWN_POINTS', '80')),
             'live_trading': os.getenv('LIVE_TRADING', 'ENABLED').upper(),
             'client_id': os.environ['CLIENT_ID'], # tdameritrade
             'refresh_token': os.environ['REFRESH_TOKEN'], # tdameritrade
