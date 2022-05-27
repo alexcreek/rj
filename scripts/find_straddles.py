@@ -32,7 +32,7 @@ def main(ticker, client, _notify, _exp, verbose):
         'NFLX': 1,
         'SHOP': 1,
         'PTON': 1,
-        'NVDA': 1,
+        'NVDA': 0.5,
         'MSFT': 1,
         'AAPL': 1,
         'V': 1,
