@@ -128,8 +128,8 @@ class Trader(Thread):
             if 'ENABLED' in self.config['live_trading']:
                 self.trade()
 
-            msg = (f"{self.exp} {self.strike} {self.putCall} ${self.config['capital']}\n"
-                   "mark={self.mark}, limit={self.limit}, stop={self.stop}")
+            msg = (f"{self.putCall} {self.exp} @ {self.strike} ${self.config['capital']}\n"
+                   f"mark={self.mark}, limit={self.limit}, stop={self.stop}")
             self.notify(msg)
             self.inq.task_done()
 
