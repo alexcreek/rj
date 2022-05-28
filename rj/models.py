@@ -54,7 +54,7 @@ class Evaluator(Thread):
 
         # Evaluate using the values of the first and last points
         changed = self.percent_change(self.values[0], self.values[-1])
-        logging.info('%s change observed', changed)
+        logging.debug('%s change observed', changed)
 
         #   -.1  <=  -.2 - do nothing
         #   -.2  <=  -.2 - buy
