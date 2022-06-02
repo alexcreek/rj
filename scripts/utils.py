@@ -111,14 +111,5 @@ def stats(df):
     }
 
 def to_dst(timestamp):
-    _date = timestamp.strftime('%m-%d')
-    short_date = dt.strptime(_date, '%m-%d')
-
-    mar13 = dt.strptime('03-13', '%m-%d')
-    nov6 = dt.strptime('11-06', '%m-%d')
-
-    dst_offset = 4
-    if short_date < mar13 or short_date > nov6:
-        dst_offset = 5
-
-    return timestamp - timedelta(hours=dst_offset)
+    est = pytz.timezone('us/eastern')
+    return timestamp.astimezone(est)
