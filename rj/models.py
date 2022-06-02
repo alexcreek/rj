@@ -66,13 +66,13 @@ class Evaluator(Thread):
         # Take positive and negative change_thresholds into account
         if self.change_threshold > 0:
             if changed >= self.change_threshold:
-                self.outq.put(Order('call', value))
-                logging.info('call triggered by %s change', changed)
+                self.outq.put(Order(self.times[-1], 'call', value))
+                logging.info('%s call triggered by %s change', self.times[-1], changed)
                 self.cooldown()
         else:
             if changed <= self.change_threshold:
-                self.outq.put(Order('put', value))
-                logging.info('put triggered by %s change', changed)
+                self.outq.put(Order(self.times[-1], 'put', value))
+                logging.info('%s put triggered by %s change', self.times[-1], changed)
                 self.cooldown()
 
     def cooldown(self):
@@ -248,7 +248,12 @@ class Point():
 
 class Order():
     """Class to encode a format for buy orders between queues"""
-    def __init__(self, putCall, last):
+    def __init__(self, timestamp, putCall, last):
+        if isinstance(timestamp, datetime.time):
+            self._timestamp = timestamp
+        else:
+            raise TypeError(timestamp)
+
         if 'put' in putCall.lower() or 'call' in putCall.lower():
             self._putCall = putCall.lower()
         else:
@@ -258,6 +263,10 @@ class Order():
             self._last = last
         else:
             raise TypeError(last)
+
+    @property
+    def timestamp(self):
+        return self._timestamp
 
     @property
     def putCall(self):

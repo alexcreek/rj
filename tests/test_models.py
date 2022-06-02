@@ -143,16 +143,16 @@ class TestPoint:
 
 class TestOrder:
     def test_that_putcall_is_lowercase(self):
-        o = Order('CALL', 1.1)
+        o = Order(dt.now().time(), 'CALL', 1.1)
         assert o.putCall == 'call'
 
     def test_that_last_is_a_float(self):
-        o = Order('call', 1.1)
+        o = Order(dt.now().time(), 'call', 1.1)
         assert isinstance(o.last, float)
 
     def test_last_exceptions(self):
         with pytest.raises(TypeError):
-            Order('call', 1)
+            Order(dt.now().time(), 'call', 1)
 
 class TestTrader:
     def test_set_strike(self, trader):
