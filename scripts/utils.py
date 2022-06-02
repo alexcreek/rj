@@ -1,6 +1,7 @@
 from datetime import datetime as dt
 from datetime import timedelta
 from dateutil.parser import parse
+import pytz
 
 def change(start, current):
     """Calculate the percent of change between two values.
@@ -14,33 +15,33 @@ def change(start, current):
     """
     return round((current - start) / start, 4)
 
-def timestamps_per_day(days, start):
+def timestamps_per_day(days, start_date):
     """Generate timestamps at 1 day intervals.
 
     Args:
         days (int): The number of days to create timestamps for.
+        start_date (str): The starting date to generate timestamps for.
 
     Returns:
         list(dict(list(dict)))
     """
-
-    if start:
-        _start = parse(start)
+    if start_date:
+        _start = parse(start_date)
     else:
         _start = dt.utcnow()
 
+    utc = pytz.utc
+    fmt = '%Y-%m-%dT%H:%M:%SZ'
 
     ret = []
     for i in range(days):
-        start = dt.isoformat(
-            _start.replace(hour=13, minute=30, second=0, microsecond=0) - timedelta(days=i)
-        )
-        stop = dt.isoformat(
-            _start.replace(hour=20, minute=00, second=0, microsecond=0) - timedelta(days=i)
-        )
+        start_dt = _start + timedelta(hours=9, minutes=30) - timedelta(days=i)
+        stop_dt = _start + timedelta(hours=16, minutes=00) - timedelta(days=i)
 
-        ret.append({i: [{'start': f'{start}Z', 'stop': f'{stop}Z'}]})
+        start = start_dt.astimezone(utc).strftime(fmt)
+        stop = stop_dt.astimezone(utc).strftime(fmt)
 
+        ret.append({i: [{'start': f'{start}', 'stop': f'{stop}'}]})
     return ret
 
 def timestamps_one_day_by_minute(dst=True):
