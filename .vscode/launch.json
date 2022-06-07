@@ -2,14 +2,22 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Backtest_rj",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "args": ["--start", "6/1/22", "-c", "100", "-p", "2", "--change", ".001"],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "Rj module",
             "type": "python",
             "request": "launch",
             "module": "rj",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"
-
         }
     ]
 }
