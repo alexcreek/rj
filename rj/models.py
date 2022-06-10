@@ -219,10 +219,11 @@ class Poller(Thread):
 
     def run(self):
         while True:
-            last = self.fetch_price()
-            if last:
-                self.outq.put(Point(dt.utcnow().time(), last))
-            sleep(self.config['polling_interval'])
+            if dt.now().time().second in (0, 30):
+                last = self.fetch_price()
+                if last:
+                    self.outq.put(Point(dt.now().time(), last))
+            sleep(1)
 
 
 class Point():
